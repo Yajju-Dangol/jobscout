@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+@theme {
+  --color-border: #222222;
+  --color-input: #27272a;
+  --color-ring: #d4d4d8;
+  --color-background: #000000;
+  --color-foreground: #ededed;
+  --color-primary: #ffffff;
+  --color-primary-foreground: #000000;
+  --color-secondary: #18181b;
+  --color-secondary-foreground: #fafafa;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #fafafa;
+  --color-muted: #18181b;
+  --color-muted-foreground: #a1a1aa;
+  --color-accent: #1e1e1e;
+  --color-accent-foreground: #fafafa;
+  --color-popover: #0a0a0a;
+  --color-popover-foreground: #ededed;
+  --color-card: #0a0a0a;
+  --color-card-foreground: #ededed;
+}
+
+@layer base {
+  html, body {
+    font-family: 'Valley Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #000000;
+    color: #ededed;
+    overflow-x: clip;
+    overflow-anchor: none;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+* {
+  font-family: 'Valley Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+@keyframes enterAnimation {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0)
+      scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), var(--tw-enter-scale, 1))
+      rotate(var(--tw-enter-rotate, 0));
+  }
+}
+
+.animate-in {
+  animation-name: enterAnimation;
+  animation-duration: 0.5s;
+  --tw-enter-opacity: initial;
+  --tw-enter-scale: initial;
+  --tw-enter-rotate: initial;
+  --tw-enter-translate-x: initial;
+  --tw-enter-translate-y: initial;
+}
+
+.fade-in {
+  --tw-enter-opacity: 0;
+}
+
+.slide-in-from-bottom-5 {
+  --tw-enter-translate-y: 1.25rem;
+}
+
+.slide-in-from-bottom-10 {
+  --tw-enter-translate-y: 2.5rem;
+}
+
+.fill-mode-backwards {
+  animation-fill-mode: backwards;
+}
+
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-500 {
+  animation-delay: 500ms;
+}
+
+.duration-500 {
+  animation-duration: 500ms;
+}
+
+.duration-1000 {
+  animation-duration: 1000ms;
+}
+
+.mask-b-from-60\%,
+.mask-b-from-60 {
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom sleek pitch black scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #222222;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #333333;
+}
+
+
