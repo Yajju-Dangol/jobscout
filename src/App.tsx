@@ -27,6 +27,26 @@ import { matchJobsForCandidate } from './lib/matcher';
 import { scrapeAndIngestJobs } from './lib/ingestion';
 import { generateCandidateQueryEmbedding } from './lib/ai';
 
+const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      return typeof window !== 'undefined' ? localStorage.getItem(key) : null;
+    } catch {
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      if (typeof window !== 'undefined') localStorage.setItem(key, value);
+    } catch {}
+  },
+  removeItem: (key: string): void => {
+    try {
+      if (typeof window !== 'undefined') localStorage.removeItem(key);
+    } catch {}
+  },
+};
+
 const createBlankGoogleProfile = (user: AuthUser): UserProfile => ({
   id: user.id,
   fullName: user.name || (user.email ? user.email.split('@')[0] : 'Google Candidate'),
@@ -113,7 +133,9 @@ export default function App() {
 
   // Always scroll viewport to the top whenever switching tabs or views
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    try {
+      window.scrollTo(0, 0);
+    } catch {}
     if (document.documentElement) {
       document.documentElement.scrollTop = 0;
     }
@@ -121,7 +143,9 @@ export default function App() {
       document.body.scrollTop = 0;
     }
     const rafId = requestAnimationFrame(() => {
-      window.scrollTo(0, 0);
+      try {
+        window.scrollTo(0, 0);
+      } catch {}
       if (document.documentElement) {
         document.documentElement.scrollTop = 0;
       }
@@ -141,7 +165,7 @@ export default function App() {
           setAuthUser(user);
           setAuthView('dashboard');
           const hasOnboardedKey = `jobscout_has_onboarded_${user.id}`;
-          if (localStorage.getItem(hasOnboardedKey) !== 'true') {
+          if (safeLocalStorage.getItem(hasOnboardedKey) !== 'true') {
             setCurrentTab('upload');
           }
           await loadUserData(user);
@@ -178,7 +202,7 @@ export default function App() {
           setAuthUser(authenticatedUser);
           setAuthView('dashboard');
           const hasOnboardedKey = `jobscout_has_onboarded_${authenticatedUser.id}`;
-          if (localStorage.getItem(hasOnboardedKey) !== 'true') {
+          if (safeLocalStorage.getItem(hasOnboardedKey) !== 'true') {
             setCurrentTab('upload');
           }
           await loadUserData(authenticatedUser);
@@ -214,13 +238,13 @@ export default function App() {
         Array.isArray(dbProf.skills) && 
         dbProf.skills.length > 0
       );
-      const isFirstTimeLogin = !dbProf || !hasUploadedResume || localStorage.getItem(hasOnboardedKey) !== 'true';
+      const isFirstTimeLogin = !dbProf || !hasUploadedResume || safeLocalStorage.getItem(hasOnboardedKey) !== 'true';
 
       if (isFirstTimeLogin) {
         // First-time users are routed straight to the Upload Resume page
         setCurrentTab('upload');
       } else {
-        localStorage.setItem(hasOnboardedKey, 'true');
+        safeLocalStorage.setItem(hasOnboardedKey, 'true');
         setCurrentTab('jobs');
       }
 
@@ -293,7 +317,7 @@ export default function App() {
     setAuthUser(user);
     setAuthView('dashboard');
     const hasOnboardedKey = `jobscout_has_onboarded_${user.id}`;
-    if (localStorage.getItem(hasOnboardedKey) !== 'true') {
+    if (safeLocalStorage.getItem(hasOnboardedKey) !== 'true') {
       setCurrentTab('upload');
     }
     showToast(`Welcome, ${user.name || 'Candidate'}!`, 'Signed in with Google. Upload your resume to start AI matching.');
@@ -368,7 +392,7 @@ export default function App() {
   const handleSaveProfile = async (updatedProfile: UserProfile) => {
     const targetUserId = authUser?.id || updatedProfile.id || profile.id;
     if (targetUserId && updatedProfile.resumeText && updatedProfile.resumeText.trim().length > 0) {
-      localStorage.setItem(`jobscout_has_onboarded_${targetUserId}`, 'true');
+      safeLocalStorage.setItem(`jobscout_has_onboarded_${targetUserId}`, 'true');
     }
     const profileWithId: UserProfile = { ...updatedProfile, id: targetUserId };
     setProfile(profileWithId);
@@ -414,7 +438,7 @@ export default function App() {
   const handleUploadSuccess = async (parsedData: Partial<UserProfile>) => {
     const targetUserId = authUser?.id || profile.id;
     if (targetUserId) {
-      localStorage.setItem(`jobscout_has_onboarded_${targetUserId}`, 'true');
+      safeLocalStorage.setItem(`jobscout_has_onboarded_${targetUserId}`, 'true');
     }
     const updatedProfile: UserProfile = {
       ...profile,
