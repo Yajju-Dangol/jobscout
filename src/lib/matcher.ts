@@ -5,6 +5,7 @@ import {
   matchJobsWithSupabaseRpc, 
   parseVector, 
   saveProfileToSupabase, 
+  isValidUUID,
   FIXED_USER_ID, 
   DatabaseJob, 
   DatabaseProfile 
@@ -77,8 +78,13 @@ export async function matchJobsForCandidate(
     };
   }
 
-  // Generate embedding using official Gemini 2 asymmetric search query format if missing
-  if (candidateProfile && (!rawCandidateEmbedding || rawCandidateEmbedding.length === 0)) {
+  // Only generate embedding if candidate has actual profile content (skills or resume text)
+  const hasProfileContent = Boolean(
+    (candidateProfile?.raw_text && candidateProfile.raw_text.trim().length > 0) ||
+    (candidateProfile?.skills && candidateProfile.skills.length > 0)
+  );
+
+  if (hasProfileContent && candidateProfile && (!rawCandidateEmbedding || rawCandidateEmbedding.length === 0)) {
     try {
       rawCandidateEmbedding = await generateCandidateQueryEmbedding({
         title: candidateProfile.title,
@@ -87,7 +93,7 @@ export async function matchJobsForCandidate(
       });
       candidateProfile.embedding = rawCandidateEmbedding;
 
-      if (userId) {
+      if (userId && userId !== 'guest' && isValidUUID(userId)) {
         await saveProfileToSupabase({
           id: userId,
           fullName: candidateProfile.full_name || 'Candidate',

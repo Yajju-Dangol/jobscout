@@ -312,6 +312,18 @@ export async function saveProfileToSupabase(profile: {
   rawText?: string;
   embedding?: number[] | null;
 }): Promise<DatabaseProfile> {
+  if (profile.id === 'guest') {
+    return {
+      id: 'guest',
+      full_name: profile.fullName,
+      title: profile.title,
+      skills: profile.skills,
+      raw_text: profile.rawText || '',
+      embedding: profile.embedding || null,
+      updated_at: new Date().toISOString(),
+    };
+  }
+
   const id = (profile.id && isValidUUID(profile.id)) ? profile.id : generateUUID();
   const payload: DatabaseProfile = {
     id,

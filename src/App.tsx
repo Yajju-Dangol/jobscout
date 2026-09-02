@@ -95,20 +95,13 @@ export default function App() {
   const loadGuestJobs = async () => {
     setIsLoading(true);
     try {
-      const matchResult = await matchJobsForCandidate({
-        userId: 'guest',
-        overrideProfile: {
-          title: profile.targetJobTitle || profile.currentTitle,
-          skills: profile.skills,
-          rawText: profile.resumeText,
-        },
-      });
+      const matchResult = await matchJobsForCandidate();
 
       if (matchResult.jobs && matchResult.jobs.length > 0) {
         setJobs(matchResult.jobs);
       } else {
         await scrapeAndIngestJobs();
-        const refreshed = await matchJobsForCandidate({ userId: 'guest' });
+        const refreshed = await matchJobsForCandidate();
         setJobs(refreshed.jobs);
       }
     } catch (err) {
