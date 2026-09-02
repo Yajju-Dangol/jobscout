@@ -13,6 +13,23 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Valley+Sans:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <script>
+      // Polyfill modern ECMAScript globals for older Safari & iOS WebKit
+      if (typeof globalThis.Iterator === 'undefined') {
+        globalThis.Iterator = function Iterator() {};
+        globalThis.Iterator.prototype = Object.create(Object.prototype);
+      }
+      if (typeof Promise.withResolvers === 'undefined') {
+        Promise.withResolvers = function () {
+          var resolve, reject;
+          var promise = new Promise(function (res, rej) {
+            resolve = res;
+            reject = rej;
+          });
+          return { promise: promise, resolve: resolve, reject: reject };
+        };
+      }
+    </script>
   </head>
   <body class="bg-[#000000] text-slate-100 min-h-screen antialiased selection:bg-white selection:text-black">
     <div id="root"></div>

@@ -1,9 +1,25 @@
-import * as pdfjsLib from 'pdfjs-dist';
+// Lazy-load PDF.js only on-demand when user uploads a PDF file
+async function getPdfjs() {
+  if (typeof (globalThis as any).Iterator === 'undefined') {
+    (globalThis as any).Iterator = function Iterator() {};
+    (globalThis as any).Iterator.prototype = Object.create(Object.prototype);
+  }
+  if (typeof (Promise as any).withResolvers === 'undefined') {
+    (Promise as any).withResolvers = function () {
+      let resolve: any, reject: any;
+      const promise = new Promise((res, rej) => {
+        resolve = res;
+        reject = rej;
+      });
+      return { promise, resolve, reject };
+    };
+  }
 
-// Ensure PDF.js worker is initialized
-if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-  // Use CDN worker matching installed version to avoid Vite asset bundler issues
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version || '4.10.38'}/pdf.worker.min.mjs`;
+  const pdfjsLib = await import('pdfjs-dist');
+  if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version || '4.10.38'}/pdf.worker.min.mjs`;
+  }
+  return pdfjsLib;
 }
 
 export interface DocumentMediaPart {
@@ -44,6 +60,7 @@ export async function extractFromPdf(arrayBuffer: ArrayBuffer, maxPages = 4): Pr
   pageImages: DocumentMediaPart[];
 }> {
   try {
+    const pdfjsLib = await getPdfjs();
     const loadingTask = pdfjsLib.getDocument({
       data: new Uint8Array(arrayBuffer),
       useSystemFonts: true,
